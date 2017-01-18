@@ -28,6 +28,8 @@ Partial Class Main
         Me.SelHeight = New System.Windows.Forms.TextBox()
         Me.InputButton = New System.Windows.Forms.Button()
         Me.ShowResultButton = New System.Windows.Forms.Button()
+        Me.RandButton = New System.Windows.Forms.Button()
+        Me.TestButton = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'Label1
@@ -80,11 +82,31 @@ Partial Class Main
         Me.ShowResultButton.Text = "Show Result"
         Me.ShowResultButton.UseVisualStyleBackColor = True
         '
+        'RandButton
+        '
+        Me.RandButton.Location = New System.Drawing.Point(193, 80)
+        Me.RandButton.Name = "RandButton"
+        Me.RandButton.Size = New System.Drawing.Size(86, 29)
+        Me.RandButton.TabIndex = 6
+        Me.RandButton.Text = "Rand"
+        Me.RandButton.UseVisualStyleBackColor = True
+        '
+        'TestButton
+        '
+        Me.TestButton.Location = New System.Drawing.Point(193, 115)
+        Me.TestButton.Name = "TestButton"
+        Me.TestButton.Size = New System.Drawing.Size(86, 29)
+        Me.TestButton.TabIndex = 7
+        Me.TestButton.Text = "Test"
+        Me.TestButton.UseVisualStyleBackColor = True
+        '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(555, 239)
+        Me.Controls.Add(Me.TestButton)
+        Me.Controls.Add(Me.RandButton)
         Me.Controls.Add(Me.ShowResultButton)
         Me.Controls.Add(Me.InputButton)
         Me.Controls.Add(Me.SelHeight)
@@ -92,7 +114,7 @@ Partial Class Main
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
         Me.Name = "Main"
-        Me.Text = "Manipulate Sandboxes"
+        Me.Text = "Manipulate Sandpiles"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -103,5 +125,7 @@ Partial Class Main
     Friend WithEvents SelHeight As System.Windows.Forms.TextBox
     Friend WithEvents InputButton As System.Windows.Forms.Button
     Friend WithEvents ShowResultButton As System.Windows.Forms.Button
+    Friend WithEvents RandButton As System.Windows.Forms.Button
+    Friend WithEvents TestButton As System.Windows.Forms.Button
 
 End Class

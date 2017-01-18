@@ -1,13 +1,14 @@
 ﻿Public Class Main
 
-
-    Private Class SandBox
+    Private Class SandPile
         Implements ICloneable
-        Implements IComparable(Of SandBox)
+        Implements IComparable(Of SandPile)
         Public ReadOnly Width As Integer
         Public ReadOnly Height As Integer
         Private prvSandBoxArray(,) As Integer
-        Public Shared Zero3x3 As New SandBox({{2, 1, 2}, {1, 0, 1}, {2, 1, 2}})
+        Public Shared Zero3x3 As New SandPile({{2, 1, 2}, {1, 0, 1}, {2, 1, 2}})
+        Public Shared Zero4x4 As New SandPile({{2, 3, 3, 2}, {3, 2, 2, 3}, {3, 2, 2, 3}, {2, 3, 3, 2}}, 4, 4)
+        Public Shared Zero5x5 As New SandPile({{2, 3, 2, 3, 2}, {3, 2, 1, 2, 3}, {2, 1, 0, 1, 2}, {3, 2, 1, 2, 3}, {2, 3, 2, 3, 2}}, 5, 5)
         Public Property SandBoxArray As Integer(,)
             Get
                 Return prvSandBoxArray
@@ -23,22 +24,22 @@
             Next
         End Function
         Public Sub ToppleMe()
-            Dim meCopy As SandBox = Me.Clone
+            Dim meCopy As SandPile = Me.Clone
             Do Until Not meCopy.NeedTopple()
-                meCopy = SandBox.OneTopple(meCopy)
+                meCopy = SandPile.OneTopple(meCopy)
             Loop
             SandBoxArray = meCopy.SandBoxArray.Clone
         End Sub
-        Public Shared Function EquivArrayAsZeroes(ArrayIn(,) As Integer) As Integer(,)
+        Public Shared Function EquivArrayAllSame(ArrayIn(,) As Integer, Optional InitVal As Integer = 0) As Integer(,)
             Dim RetArray(,) As Integer = ArrayIn.Clone
             For thisColNum As Integer = 0 To ArrayIn.GetUpperBound(0)
                 For thisRowNum As Integer = 0 To ArrayIn.GetUpperBound(1)
-                    RetArray(thisColNum, thisRowNum) = 0
+                    RetArray(thisColNum, thisRowNum) = InitVal
                 Next
             Next
             Return RetArray
         End Function
-        Public Sub Add(SBToAdd As SandBox, Optional FullTopple As Boolean = False)
+        Public Sub Add(SBToAdd As SandPile, Optional FullTopple As Boolean = False)
             If SBToAdd.Width <> Width Then Throw New Exception("Cannot add a sandbox of different width: " & Width & " vs " & SBToAdd.Width)
             If SBToAdd.Height <> Height Then Throw New Exception("Cannot add a sandbox of different height: " & Height & " vs " & SBToAdd.Height)
             For thisColNum As Integer = 0 To Width - 1
@@ -49,15 +50,34 @@
             Next
             If FullTopple Then ToppleMe()
         End Sub
+        Public Function MeFull() As SandPile
+            Return New SandPile(EquivArrayAllSame(SandBoxArray, 3), Width, Height)
+        End Function
+        Public Function MyZero() As SandPile
+            If Width = 3 And Height = 3 Then Return Zero3x3
+            If Width = 4 And Height = 4 Then Return Zero4x4
+            If Width = 5 And Height = 5 Then Return Zero5x5
+            Return Nothing
+        End Function
         Public Function InSet() As Boolean
-            If Width <> 3 Or Height <> 3 Then Throw New Exception("Only 3x3 can currently be checked")
-            Dim meCopy As SandBox = Me.Clone
-            meCopy.Add(Zero3x3)
+            If MyZero() Is Nothing Then Throw New Exception("Cannot calculate Inset for these dimensions")
+            Dim meCopy As SandPile = Me.Clone
+            meCopy.Add(MyZero)
             Return Me.CompareTo(meCopy) = 0
         End Function
-        Public Shared Function OneTopple(_SandBox As SandBox) As SandBox
+        Public Function TotGrains() As Integer
+            TotGrains = 0
+            Dim meToTopple As SandPile = Me.Clone
+            meToTopple.ToppleMe()
+            For thisColNum As Integer = 0 To Width - 1
+                For thisRowNum As Integer = 0 To Height - 1
+                    TotGrains += meToTopple.SandBoxArray(thisColNum, thisRowNum)
+                Next
+            Next
+        End Function
+        Public Shared Function OneTopple(_SandBox As SandPile) As SandPile
             If Not _SandBox.NeedTopple Then Return _SandBox
-            Dim ArrayOut(,) As Integer = EquivArrayAsZeroes(_SandBox.SandBoxArray)
+            Dim ArrayOut(,) As Integer = EquivArrayAllSame(_SandBox.SandBoxArray)
             For thisColNum As Integer = 0 To _SandBox.Width - 1
                 For thisRowNum As Integer = 0 To _SandBox.Height - 1
                     Dim thisVal As Integer = _SandBox.SandBoxArray(thisColNum, thisRowNum)
@@ -72,7 +92,7 @@
                     End If
                 Next
             Next
-            Return New SandBox(ArrayOut, _SandBox.Width, _SandBox.Height)
+            Return New SandPile(ArrayOut, _SandBox.Width, _SandBox.Height)
         End Function
         Public Sub New(Elements(,) As Integer, Optional _Width As Integer = 3, Optional _Height As Integer = 3)
             Width = _Width
@@ -95,17 +115,16 @@
             ToString &= "-----------" & vbCrLf
         End Function
         Public Function Clone() As Object Implements ICloneable.Clone
-            Return DirectCast(MemberwiseClone(), SandBox)
+            Return New SandPile(Me.SandBoxArray.Clone, Me.Width, Me.Height)
         End Function
-
         Protected Overrides Sub Finalize()
             MyBase.Finalize()
         End Sub
-        Public Function CompareTo(other As SandBox) As Integer Implements IComparable(Of SandBox).CompareTo
+        Public Function CompareTo(other As SandPile) As Integer Implements IComparable(Of SandPile).CompareTo
             If Width <> other.Width Then Return Width.CompareTo(other.Width)
             If Height <> other.Height Then Return Height.CompareTo(other.Height)
-            Dim origToppled As SandBox = Me.Clone
-            Dim otherToppled As SandBox = other.Clone
+            Dim origToppled As SandPile = Me.Clone
+            Dim otherToppled As SandPile = other.Clone
             origToppled.ToppleMe()
             otherToppled.ToppleMe()
             For thisColNum As Integer = 0 To Width - 1
@@ -119,19 +138,23 @@
 
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        Dim SBArrIn(,) = {{3, 3, 3}, {3, 2, 3}, {3, 3, 3}}
+        SelWidth.Text = 3
+        SelHeight.Text = 3
+
+        Dim SBArrIn(,) = {{1, 1, 1}, {2, 2, 2}, {3, 3, 3}}
         Dim SBArrAdd(,) = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}
 
         Try
-            Dim SBIn As New SandBox(SBArrAdd)
-            Dim SBCopy As SandBox = SBIn.Clone
-            SBIn.Add(SandBox.Zero3x3)
+            Dim SBIn As New SandPile(SBArrAdd)
+            MsgBox(New SandPile(SBArrIn).ToString)
+            Dim SBCopy As SandPile = SBIn.Clone
+            SBIn.Add(SandPile.Zero3x3)
             MsgBox("In set: " & SBIn.InSet)
             'MsgBox(SBCopy.CompareTo(SBIn))
             'SBCopy.ToppleMe()
             MsgBox(SBCopy.ToString)
             Do Until Not SBIn.NeedTopple
-                SBIn = SandBox.OneTopple(SBIn)
+                SBIn = SandPile.OneTopple(SBIn)
                 MsgBox(SBIn.ToString)
             Loop
         Catch ex As Exception
@@ -140,4 +163,69 @@
 
     End Sub
 
+    Private Sub InputButton_Click(sender As Object, e As EventArgs) Handles InputButton.Click
+
+        Dim thisPA() As Integer = {SelWidth.Text, SelHeight.Text}
+        Dim thisArr(,) As Integer = Array.CreateInstance(GetType(Integer), thisPA)
+        For thisRowNum As Integer = 0 To thisArr.GetUpperBound(1)
+            Dim csv As String = InputBox("Input Row " & thisRowNum + 1 & " of " & SelWidth.Text & " numbers separated by commas")
+            Dim csvSpl() As String = Split(csv, ",")
+            If csvSpl.Count <> SelWidth.Text Then
+                MsgBox("Invalid number of cells")
+                Exit Sub
+            End If
+            For thisColNum As Integer = 0 To csvSpl.Count - 1
+                Dim thisVal As String = csvSpl(thisColNum)
+                If Not IsNumeric(thisVal) OrElse thisVal <> Math.Floor(Convert.ToDecimal(thisVal)) OrElse thisVal < 0 Then
+                    MsgBox("Each value must be an integer")
+                    Exit Sub
+                End If
+                thisArr.SetValue(Convert.ToInt32(thisVal), {thisColNum, thisRowNum})
+            Next
+        Next
+        MsgBox("Array successfully initialized")
+        MsgBox(New SandPile(thisArr, SelWidth.Text, SelHeight.Text).ToString)
+
+    End Sub
+
+    Private Sub RandButton_Click(sender As Object, e As EventArgs) Handles RandButton.Click
+
+        Dim totBefore As Integer = 0
+        Dim totAfter As Integer = 0
+        Dim totHist(3) As Integer
+        Dim thisRand As New Random
+        For i As Integer = 1 To 1000
+            Dim thisAD() As Integer = {SelWidth.Text, SelHeight.Text}
+            Dim thisArr(,) As Integer = Array.CreateInstance(GetType(Integer), thisAD)
+            For thisRowNum As Integer = 0 To thisArr.GetUpperBound(0)
+                For thisColNum As Integer = 0 To thisArr.GetUpperBound(1)
+                    Dim thisNext As Integer = thisRand.Next(1000 * 3) Mod 4
+                    totHist(thisNext) += 1
+                    thisArr(thisRowNum, thisColNum) = thisNext
+                Next
+            Next
+            Dim randPile As New SandPile(thisArr, SelWidth.Text, SelHeight.Text)
+            If randPile.InSet Then totBefore += 1
+            ' MsgBox("Orig:" & vbCrLf & vbCrLf & randPile.ToString & vbCrLf & vbCrLf & "In Set: " & randPile.InSet)
+            randPile.Add(randPile.MeFull)
+            If randPile.InSet Then totAfter += 1
+            ' MsgBox("After Adding:" & vbCrLf & vbCrLf & randPile.ToString & vbCrLf & vbCrLf & "In Set: " & randPile.InSet)
+        Next
+        MsgBox("Total Before: " & totBefore & " Total After: " & totAfter)
+        MsgBox("Totals " & totHist(0) & " " & totHist(1) & " " & totHist(2) & " " & totHist(3))
+
+
+    End Sub
+
+    Private Sub TestButton_Click(sender As Object, e As EventArgs) Handles TestButton.Click
+
+        Dim myArr(,) As Integer = Array.CreateInstance(GetType(Integer), {101, 101})
+        Dim myArrZero(,) As Integer = SandPile.EquivArrayAllSame(myArr)
+        myArrZero(50, 50) = 1032 * 1032
+        Dim mySP As New SandPile(myArrZero, 101, 101)
+        mySP.ToppleMe()
+        MsgBox(mySP.ToString)
+        MsgBox(mySP.TotGrains)
+
+    End Sub
 End Class
