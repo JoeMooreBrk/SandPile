@@ -184,7 +184,12 @@
             Next
         Next
         MsgBox("Array successfully initialized")
-        MsgBox(New SandPile(thisArr, SelWidth.Text, SelHeight.Text).ToString)
+        Dim thisSandPile As New SandPile(thisArr, SelWidth.Text, SelHeight.Text)
+        MsgBox(thisSandPile.ToString)
+        Do Until thisSandPile.NeedTopple = False
+            thisSandPile = SandPile.OneTopple(thisSandPile)
+            MsgBox(thisSandPile.ToString)
+        Loop
 
     End Sub
 
