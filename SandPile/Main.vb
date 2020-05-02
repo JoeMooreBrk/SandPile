@@ -64,7 +64,7 @@
             If MyZero() Is Nothing Then Throw New Exception("Cannot calculate Inset for these dimensions")
             Dim meCopy As SandPileVB = Me.Clone
             meCopy.Add(MyZero)
-            Return Me.CompareTo(meCopy) = 0
+            Return Me.CompareFullyToppled(meCopy) = 0
         End Function
         Public Function TotGrains() As Integer
             TotGrains = 0
@@ -121,7 +121,17 @@
         Protected Overrides Sub Finalize()
             MyBase.Finalize()
         End Sub
-        Public Function CompareTo(other As SandPileVB) As Integer Implements IComparable(Of SandPileVB).CompareTo
+        Public Function CompareTo(other As Main.SandPileVB) As Integer Implements IComparable(Of SandPileVB).CompareTo
+            If Width <> other.Width Then Return Width.CompareTo(other.Width)
+            If Height <> other.Height Then Return Height.CompareTo(other.Height)
+            For i As Integer = 0 To SandBoxArray.GetLength(0) - 1
+                For j As Integer = 0 To SandBoxArray.GetLength(1) - 1
+                    If SandBoxArray(i, j).CompareTo(other.SandBoxArray(i, j)) <> 0 Then Return SandBoxArray(i, j).CompareTo(other.SandBoxArray(i, j)) <> 0
+                Next
+            Next
+            Return 0
+        End Function
+        Public Function CompareFullyToppled(other As SandPileVB) As Integer
             If Width <> other.Width Then Return Width.CompareTo(other.Width)
             If Height <> other.Height Then Return Height.CompareTo(other.Height)
             Dim origToppled As SandPileVB = Me.Clone

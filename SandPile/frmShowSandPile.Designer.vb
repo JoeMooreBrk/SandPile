@@ -26,10 +26,12 @@ Partial Class frmShowSandPile
         Me.btnOneTopple = New System.Windows.Forms.Button()
         Me.btnAdd3s = New System.Windows.Forms.Button()
         Me.txtSBInfo = New System.Windows.Forms.TextBox()
+        Me.btnContinuous = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'rtbSandBoxArea
         '
+        Me.rtbSandBoxArea.Font = New System.Drawing.Font("Courier New", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.rtbSandBoxArea.Location = New System.Drawing.Point(12, 12)
         Me.rtbSandBoxArea.Name = "rtbSandBoxArea"
         Me.rtbSandBoxArea.ReadOnly = True
@@ -64,11 +66,21 @@ Partial Class frmShowSandPile
         Me.txtSBInfo.Size = New System.Drawing.Size(771, 22)
         Me.txtSBInfo.TabIndex = 3
         '
+        'btnContinuous
+        '
+        Me.btnContinuous.Location = New System.Drawing.Point(326, 547)
+        Me.btnContinuous.Name = "btnContinuous"
+        Me.btnContinuous.Size = New System.Drawing.Size(103, 27)
+        Me.btnContinuous.TabIndex = 4
+        Me.btnContinuous.Text = "Continuous"
+        Me.btnContinuous.UseVisualStyleBackColor = True
+        '
         'frmShowSandPile
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(795, 613)
+        Me.Controls.Add(Me.btnContinuous)
         Me.Controls.Add(Me.txtSBInfo)
         Me.Controls.Add(Me.btnAdd3s)
         Me.Controls.Add(Me.btnOneTopple)
@@ -84,4 +96,5 @@ Partial Class frmShowSandPile
     Friend WithEvents btnOneTopple As Button
     Friend WithEvents btnAdd3s As Button
     Friend WithEvents txtSBInfo As TextBox
+    Friend WithEvents btnContinuous As Button
 End Class

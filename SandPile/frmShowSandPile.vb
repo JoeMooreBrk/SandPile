@@ -1,8 +1,12 @@
 ﻿Imports SandPileC
 Public Class frmShowSandPile
     Public Property frmSandPile As SandPile
+    Public NumTopples As Integer = 0
+    Private WithEvents myTimer As New Timer
+    Private compareSP As SandPile
+    Private compareTopples As Nullable(Of Integer)
     Private Sub frmShowSandPile_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+        NumTopples = 0
     End Sub
     Public Sub ShowMySandPile()
         SandPileUtils.PutSandPileInRichTextBox(rtbSandBoxArea, frmSandPile)
@@ -13,6 +17,7 @@ Public Class frmShowSandPile
         Else
             txtSBInfo.Text = "This sandbox is not in set"
         End If
+        txtSBInfo.Text &= $"  Grains: {frmSandPile.TotGrains} Topples: {NumTopples}"
         CheckButtons()
     End Sub
 
@@ -22,6 +27,7 @@ Public Class frmShowSandPile
             MsgBox("No sandpile loaded")
         End If
         frmSandPile = SandPile.OneTopple(frmSandPile)
+        NumTopples += 1
         ShowMySandPile()
     End Sub
 
@@ -31,6 +37,32 @@ Public Class frmShowSandPile
         ShowMySandPile()
     End Sub
     Private Sub CheckButtons()
+        If Not frmSandPile.NeedTopple Then myTimer.Stop()
         btnOneTopple.Enabled = frmSandPile.NeedTopple
+    End Sub
+    Private Sub myTimer_Tick() Handles myTimer.Tick
+        Dim keepSameCol = 2
+        Dim keepSameRow = 2
+        myTimer.Stop()
+        If Not frmSandPile.NeedTopple Then myTimer.Stop()
+        btnOneTopple_Click(Nothing, Nothing)
+        myTimer.Start()
+        If frmSandPile.SandBoxArray(0, 0) <> 0 AndAlso compareSP Is Nothing Then
+            myTimer.Stop()
+            compareSP = frmSandPile.Clone
+            compareTopples = NumTopples
+            MsgBox($"Saved sandpile with populated corner at {NumTopples} topples.  Press button again to restart.")
+        ElseIf Not compareSP Is Nothing Then
+            compareSP.AddAtSpot(frmSandPile.SandBoxArray(keepSameCol, keepSameRow) - compareSP.SandBoxArray(keepSameCol, keepSameRow), keepSameCol, keepSameRow)
+            If (compareSP.CompareTo(frmSandPile) = 0) Then
+                myTimer.Stop()
+                MsgBox($"Cycle found at {NumTopples - compareTopples.Value}")
+            End If
+        End If
+    End Sub
+
+    Private Sub btnContinuous_Click(sender As Object, e As EventArgs) Handles btnContinuous.Click
+        myTimer.Interval = 100
+        myTimer.Start()
     End Sub
 End Class

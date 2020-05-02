@@ -83,10 +83,18 @@ namespace SandPileC
             for (int i = 0; i < richTextBox.Text.Length; i++)
             {
                 var thisChar = richTextBox.Text.Substring(i, 1);
-                if (!zeroTo3.IsMatch(thisChar))
+                richTextBox.Select(i, 1);
+                if (!zeroTo3.IsMatch(thisChar)) richTextBox.SelectionColor = Color.Red;
+                else
                 {
-                    richTextBox.Select(i, 1);
-                    richTextBox.SelectionColor = Color.Red;
+                    switch (thisChar)
+                    {
+                        case "0": richTextBox.SelectionColor = Color.Gray; break;
+                        case "1": richTextBox.SelectionColor = Color.Green; break;
+                        case "2": richTextBox.SelectionColor = Color.Blue; break;
+                        case "3": richTextBox.SelectionColor = Color.DarkViolet; break;
+                        default: throw new Exception($"Unknown character: {thisChar}");
+                    }
                 }
             }
             richTextBox.Select(0, 0);

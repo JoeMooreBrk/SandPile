@@ -10,8 +10,8 @@ namespace SandPile.Test
         [TestMethod]
         public void TenByTenwith100()
         {
-            var tenByTen = SandPileUtils.All0s(11, 11);
-            tenByTen.AddAtSpot(1000, 5, 5);
+            var tenByTen = SandPileUtils.All0s(5, 5);
+            tenByTen.AddAtSpot(10000, 2, 2);
             ShowTest.doShow(tenByTen);
         }
     }

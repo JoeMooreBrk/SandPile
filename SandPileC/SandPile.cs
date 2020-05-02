@@ -8,9 +8,13 @@ using System.Threading.Tasks;
 
 namespace SandPileC
 {
-    public static class SandPileZeros
+    public static class SandPileInit
     {
-        public static List<SandPile> KnownZeros
+        public static List<SandPile> KnownZeros = LoadZeroes.LoadKnownZeros;
+    }
+    public class LoadZeroes
+    {
+        public static List<SandPile> LoadKnownZeros
         {
             get
             {
@@ -26,21 +30,7 @@ namespace SandPileC
                     5, 5, true));
                 return retList;
             }
-            private set { }
-        }
-        public static SandPile GetZero(SandPile sandPile)
-        {
-            var useZeros = KnownZeros;
-            var zerosOfDim = useZeros.
-                Where(s => s.CompareDimensions(sandPile) == 0).
-                ToList();
-            if (zerosOfDim.Count() > 1) throw new Exception($"More than 1 zero of width {sandPile.Width} and height {sandPile.Height} exist");
-            if (zerosOfDim.Count() == 0) return null;
-            return zerosOfDim[0];
-        }
-        public static bool ZeroExists(SandPile sandPile)
-        {
-            return GetZero(sandPile) != null;
+            set { }
         }
     }
     public class SandPile : ICloneable, IComparable<SandPile>
@@ -117,24 +107,19 @@ namespace SandPileC
             if (MyZero == null) return null;
             SandPile meCopy = (SandPile)this.Clone();
             meCopy.Add(MyZero);
-            return this.CompareTo(meCopy) == 0;
+            return this.CompareFullyToppled(meCopy) == 0;
         }
         public int TotGrains()
         {
-            var retTot = 0;
-            SandPile meToTopple = (SandPile)this.Clone();
-            meToTopple.ToppleMe();
-            for (int thisColNum = 0; thisColNum <= Width - 1; thisColNum++)
-            {
-                for (int thisRowNum = 0; thisRowNum <= Height - 1; thisRowNum++)
-                    retTot += meToTopple.SandBoxArray[thisColNum, thisRowNum];
-            }
-            return retTot;
+            var totGrains = 0;
+            foreach (var thisTot in SandBoxArray) totGrains += thisTot;
+            return totGrains;
         }
         public static SandPile OneTopple(SandPile _SandBox)
         {
             if (!_SandBox.NeedTopple())
                 return _SandBox;
+            var startGrains = _SandBox.TotGrains();
             int[,] ArrayOut = EquivArrayAllSame(_SandBox.SandBoxArray);
             for (int thisColNum = 0; thisColNum <= _SandBox.Width - 1; thisColNum++)
             {
@@ -157,7 +142,9 @@ namespace SandPileC
                         ArrayOut[thisColNum, thisRowNum] += thisVal;
                 }
             }
-            return new SandPile(ArrayOut, _SandBox.Width, _SandBox.Height);
+            var retSP = new SandPile(ArrayOut, _SandBox.Width, _SandBox.Height);
+            if (retSP.TotGrains() > startGrains) throw new Exception($"This topple gained grains! Orig: {_SandBox.ToString()} Toppled: {retSP.ToString()}");
+            return retSP;
         }
         private static int[,] ArrayOfArrays2TwoDim(int[][] Elements, int _Width = 3, int _Height = 3)
         {
@@ -187,7 +174,16 @@ namespace SandPileC
             if (Elements.GetUpperBound(1) + 1 != Height)
                 throw new Exception("Height is " + Height + ". but second dimension of array is " + Elements.GetUpperBound(1) + 1);
             SandBoxArray = Elements;
-            if (!isZero) MyZero = SandPileZeros.GetZero(this);
+            if (!isZero) MyZero = GetZero();
+        }
+        public SandPile GetZero()
+        {
+            var zerosOfDim = SandPileInit.KnownZeros.
+                Where(s => s.CompareDimensions(this) == 0).
+                ToList();
+            if (zerosOfDim.Count() > 1) throw new Exception($"More than 1 zero of width {Width} and height {Height} exist");
+            if (zerosOfDim.Count() == 0) return null;
+            return zerosOfDim[0];
         }
         public string RawDump()
         {
@@ -227,6 +223,19 @@ namespace SandPileC
         {
         }
         public int CompareTo(SandPile other)
+        {
+            if (Width != other.Width)
+                return Width.CompareTo(other.Width);
+            if (Height != other.Height)
+                return Height.CompareTo(other.Height);
+            for (int i = 0; i < SandBoxArray.GetLength(0); i++)
+                for (int j = 0; j < SandBoxArray.GetLength(1); j++)
+                {
+                    if (SandBoxArray[i, j].CompareTo(other.SandBoxArray[i, j]) != 0) return SandBoxArray[i, j].CompareTo(other.SandBoxArray[i, j]);
+                }
+            return 0;
+        }
+        public int CompareFullyToppled(SandPile other)
         {
             if (Width != other.Width)
                 return Width.CompareTo(other.Width);
