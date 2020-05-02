@@ -1,14 +1,15 @@
 ﻿Public Class Main
 
-    Private Class SandPile
+    <Obsolete("Use SandPileC.SandPile instead")>
+    Private Class SandPileVB
         Implements ICloneable
-        Implements IComparable(Of SandPile)
+        Implements IComparable(Of SandPileVB)
         Public ReadOnly Width As Integer
         Public ReadOnly Height As Integer
         Private prvSandBoxArray(,) As Integer
-        Public Shared Zero3x3 As New SandPile({{2, 1, 2}, {1, 0, 1}, {2, 1, 2}})
-        Public Shared Zero4x4 As New SandPile({{2, 3, 3, 2}, {3, 2, 2, 3}, {3, 2, 2, 3}, {2, 3, 3, 2}}, 4, 4)
-        Public Shared Zero5x5 As New SandPile({{2, 3, 2, 3, 2}, {3, 2, 1, 2, 3}, {2, 1, 0, 1, 2}, {3, 2, 1, 2, 3}, {2, 3, 2, 3, 2}}, 5, 5)
+        Public Shared Zero3x3 As New SandPileVB({{2, 1, 2}, {1, 0, 1}, {2, 1, 2}})
+        Public Shared Zero4x4 As New SandPileVB({{2, 3, 3, 2}, {3, 2, 2, 3}, {3, 2, 2, 3}, {2, 3, 3, 2}}, 4, 4)
+        Public Shared Zero5x5 As New SandPileVB({{2, 3, 2, 3, 2}, {3, 2, 1, 2, 3}, {2, 1, 0, 1, 2}, {3, 2, 1, 2, 3}, {2, 3, 2, 3, 2}}, 5, 5)
         Public Property SandBoxArray As Integer(,)
             Get
                 Return prvSandBoxArray
@@ -24,9 +25,9 @@
             Next
         End Function
         Public Sub ToppleMe()
-            Dim meCopy As SandPile = Me.Clone
+            Dim meCopy As SandPileVB = Me.Clone
             Do Until Not meCopy.NeedTopple()
-                meCopy = SandPile.OneTopple(meCopy)
+                meCopy = SandPileVB.OneTopple(meCopy)
             Loop
             SandBoxArray = meCopy.SandBoxArray.Clone
         End Sub
@@ -39,7 +40,7 @@
             Next
             Return RetArray
         End Function
-        Public Sub Add(SBToAdd As SandPile, Optional FullTopple As Boolean = False)
+        Public Sub Add(SBToAdd As SandPileVB, Optional FullTopple As Boolean = False)
             If SBToAdd.Width <> Width Then Throw New Exception("Cannot add a sandbox of different width: " & Width & " vs " & SBToAdd.Width)
             If SBToAdd.Height <> Height Then Throw New Exception("Cannot add a sandbox of different height: " & Height & " vs " & SBToAdd.Height)
             For thisColNum As Integer = 0 To Width - 1
@@ -50,10 +51,10 @@
             Next
             If FullTopple Then ToppleMe()
         End Sub
-        Public Function MeFull() As SandPile
-            Return New SandPile(EquivArrayAllSame(SandBoxArray, 3), Width, Height)
+        Public Function MeFull() As SandPileVB
+            Return New SandPileVB(EquivArrayAllSame(SandBoxArray, 3), Width, Height)
         End Function
-        Public Function MyZero() As SandPile
+        Public Function MyZero() As SandPileVB
             If Width = 3 And Height = 3 Then Return Zero3x3
             If Width = 4 And Height = 4 Then Return Zero4x4
             If Width = 5 And Height = 5 Then Return Zero5x5
@@ -61,13 +62,13 @@
         End Function
         Public Function InSet() As Boolean
             If MyZero() Is Nothing Then Throw New Exception("Cannot calculate Inset for these dimensions")
-            Dim meCopy As SandPile = Me.Clone
+            Dim meCopy As SandPileVB = Me.Clone
             meCopy.Add(MyZero)
             Return Me.CompareTo(meCopy) = 0
         End Function
         Public Function TotGrains() As Integer
             TotGrains = 0
-            Dim meToTopple As SandPile = Me.Clone
+            Dim meToTopple As SandPileVB = Me.Clone
             meToTopple.ToppleMe()
             For thisColNum As Integer = 0 To Width - 1
                 For thisRowNum As Integer = 0 To Height - 1
@@ -75,7 +76,7 @@
                 Next
             Next
         End Function
-        Public Shared Function OneTopple(_SandBox As SandPile) As SandPile
+        Public Shared Function OneTopple(_SandBox As SandPileVB) As SandPileVB
             If Not _SandBox.NeedTopple Then Return _SandBox
             Dim ArrayOut(,) As Integer = EquivArrayAllSame(_SandBox.SandBoxArray)
             For thisColNum As Integer = 0 To _SandBox.Width - 1
@@ -92,7 +93,7 @@
                     End If
                 Next
             Next
-            Return New SandPile(ArrayOut, _SandBox.Width, _SandBox.Height)
+            Return New SandPileVB(ArrayOut, _SandBox.Width, _SandBox.Height)
         End Function
         Public Sub New(Elements(,) As Integer, Optional _Width As Integer = 3, Optional _Height As Integer = 3)
             Width = _Width
@@ -115,16 +116,16 @@
             ToString &= "-----------" & vbCrLf
         End Function
         Public Function Clone() As Object Implements ICloneable.Clone
-            Return New SandPile(Me.SandBoxArray.Clone, Me.Width, Me.Height)
+            Return New SandPileVB(Me.SandBoxArray.Clone, Me.Width, Me.Height)
         End Function
         Protected Overrides Sub Finalize()
             MyBase.Finalize()
         End Sub
-        Public Function CompareTo(other As SandPile) As Integer Implements IComparable(Of SandPile).CompareTo
+        Public Function CompareTo(other As SandPileVB) As Integer Implements IComparable(Of SandPileVB).CompareTo
             If Width <> other.Width Then Return Width.CompareTo(other.Width)
             If Height <> other.Height Then Return Height.CompareTo(other.Height)
-            Dim origToppled As SandPile = Me.Clone
-            Dim otherToppled As SandPile = other.Clone
+            Dim origToppled As SandPileVB = Me.Clone
+            Dim otherToppled As SandPileVB = other.Clone
             origToppled.ToppleMe()
             otherToppled.ToppleMe()
             For thisColNum As Integer = 0 To Width - 1
@@ -145,16 +146,16 @@
         Dim SBArrAdd(,) = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}
 
         Try
-            Dim SBIn As New SandPile(SBArrAdd)
-            MsgBox(New SandPile(SBArrIn).ToString)
-            Dim SBCopy As SandPile = SBIn.Clone
-            SBIn.Add(SandPile.Zero3x3)
+            Dim SBIn As New SandPileVB(SBArrAdd)
+            MsgBox(New SandPileVB(SBArrIn).ToString)
+            Dim SBCopy As SandPileVB = SBIn.Clone
+            SBIn.Add(SandPileVB.Zero3x3)
             MsgBox("In set: " & SBIn.InSet)
             'MsgBox(SBCopy.CompareTo(SBIn))
             'SBCopy.ToppleMe()
             MsgBox(SBCopy.ToString)
             Do Until Not SBIn.NeedTopple
-                SBIn = SandPile.OneTopple(SBIn)
+                SBIn = SandPileVB.OneTopple(SBIn)
                 MsgBox(SBIn.ToString)
             Loop
         Catch ex As Exception
@@ -184,10 +185,10 @@
             Next
         Next
         MsgBox("Array successfully initialized")
-        Dim thisSandPile As New SandPile(thisArr, SelWidth.Text, SelHeight.Text)
+        Dim thisSandPile As New SandPileVB(thisArr, SelWidth.Text, SelHeight.Text)
         MsgBox(thisSandPile.ToString)
         Do Until thisSandPile.NeedTopple = False
-            thisSandPile = SandPile.OneTopple(thisSandPile)
+            thisSandPile = SandPileVB.OneTopple(thisSandPile)
             MsgBox(thisSandPile.ToString)
         Loop
 
@@ -209,7 +210,7 @@
                     thisArr(thisRowNum, thisColNum) = thisNext
                 Next
             Next
-            Dim randPile As New SandPile(thisArr, SelWidth.Text, SelHeight.Text)
+            Dim randPile As New SandPileVB(thisArr, SelWidth.Text, SelHeight.Text)
             If randPile.InSet Then totBefore += 1
             ' MsgBox("Orig:" & vbCrLf & vbCrLf & randPile.ToString & vbCrLf & vbCrLf & "In Set: " & randPile.InSet)
             randPile.Add(randPile.MeFull)
@@ -225,12 +226,18 @@
     Private Sub TestButton_Click(sender As Object, e As EventArgs) Handles TestButton.Click
 
         Dim myArr(,) As Integer = Array.CreateInstance(GetType(Integer), {101, 101})
-        Dim myArrZero(,) As Integer = SandPile.EquivArrayAllSame(myArr)
+        Dim myArrZero(,) As Integer = SandPileVB.EquivArrayAllSame(myArr)
         myArrZero(50, 50) = 1032 * 1032
-        Dim mySP As New SandPile(myArrZero, 101, 101)
+        Dim mySP As New SandPileVB(myArrZero, 101, 101)
         mySP.ToppleMe()
         MsgBox(mySP.ToString)
         MsgBox(mySP.TotGrains)
 
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Using showIt As New frmShowSandPile
+            showIt.ShowDialog()
+        End Using
     End Sub
 End Class
