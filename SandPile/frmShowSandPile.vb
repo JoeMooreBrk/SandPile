@@ -10,13 +10,16 @@ Public Class frmShowSandPile
     End Sub
     Public Sub ShowMySandPile()
         SandPileUtils.PutSandPileInRichTextBox(rtbSandBoxArea, frmSandPile)
-        If Not frmSandPile.InSet.HasValue Then
-            txtSBInfo.Text = "No zero definition available"
-        ElseIf frmSandPile.InSet.Value Then
-            txtSBInfo.Text = "This sandbox is in set"
-        Else
-            txtSBInfo.Text = "This sandbox is not in set"
-        End If
+        Select Case frmSandPile.InSet
+            Case SandPile.InSetStatus.InSet
+                txtSBInfo.Text = "This sandbox is in set"
+            Case SandPile.InSetStatus.NotInSet
+                txtSBInfo.Text = "This sandbox is not in set"
+            Case SandPile.InSetStatus.NoZero
+                txtSBInfo.Text = "No zero definition available"
+            Case Else
+                Throw New Exception($"Invalid status for sanbox in set: {frmSandPile.InSet.ToString}")
+        End Select
         txtSBInfo.Text &= $"  Grains: {frmSandPile.TotGrains} Topples: {NumTopples}"
         CheckButtons()
     End Sub

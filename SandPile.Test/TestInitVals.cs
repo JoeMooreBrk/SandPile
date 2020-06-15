@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SandPileC;
+using static SandPileC.SandPile;
 using static SandPileC.SandPileUtils;
 
 namespace SandPile.Test
@@ -27,7 +28,7 @@ namespace SandPile.Test
             var sand1 = new SandPileFromStrings(test1);
             Assert.AreEqual(test1, sand1.SandPile.RawDump());
             var str = sand1.SandPile.ToString();
-            Assert.IsFalse(sand1.SandPile.InSet().HasValue);
+            Assert.AreEqual(InSetStatus.NoZero, sand1.SandPile.InSet);
             str = sand1.SandPile.ToString();
             sand1.SandPile.ToppleMe();
             var numInSet = 0;
@@ -35,16 +36,16 @@ namespace SandPile.Test
             for (int i = 0; i < 20; i++)
             {
                 var rand33 = GetRandomSandPile(3, 3);
-                if (rand33.InSet().Value) numInSet += 1;
+                if (rand33.InSet == InSetStatus.InSet) numInSet += 1;
                 rand33.Add(all3s);
                 rand33.ToppleMe();
-                Assert.IsTrue(rand33.InSet().Value);
+                Assert.AreEqual(InSetStatus.InSet, rand33.InSet);
             }
             var all2sStr = @"222
 222
 222";
             var all2SP = new SandPileFromStrings(all2sStr);
-            Assert.IsTrue(all2SP.SandPile.InSet().Value);
+            Assert.AreEqual(InSetStatus.InSet, all2SP.SandPile.InSet);
         }
     }
 }

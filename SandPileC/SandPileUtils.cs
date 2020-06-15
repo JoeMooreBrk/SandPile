@@ -12,6 +12,38 @@ namespace SandPileC
 {
     public class SandPileUtils
     {
+        public sealed class KnownZeros
+        {
+            private static readonly KnownZeros instance = new KnownZeros();
+            public static List<SandPile> Known { get; private set; }
+            // Explicit static constructor to tell C# compiler
+            // not to mark type as beforefieldinit
+            static KnownZeros()
+            {
+                Known = LoadZeroes.LoadKnownZeros;
+            }
+
+            private KnownZeros()
+            {
+            }
+
+            public static KnownZeros Instance
+            {
+                get
+                {
+                    return instance;
+                }
+            }
+            public static SandPile OfDimension(int _width, int _height)
+            {
+                var zerosOfDim = Known.
+                    Where(s => s.Width == _width && s.Height == _height).
+                    ToList();
+                if (zerosOfDim.Count() == 1) return zerosOfDim[0];
+                if (zerosOfDim.Count() == 0) return null;
+                throw new Exception($"More than one zero match dimensions {_width}, {_height}");
+            }
+        }
         public class SandPileFromStrings
         {
             public string StringIn { get; private set; }

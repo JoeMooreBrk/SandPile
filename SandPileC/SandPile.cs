@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static SandPileC.SandPileUtils;
 
 namespace SandPileC
 {
-    public static class SandPileInit
-    {
-        public static List<SandPile> KnownZeros = LoadZeroes.LoadKnownZeros;
-    }
     public class LoadZeroes
     {
         public static List<SandPile> LoadKnownZeros
@@ -37,7 +35,15 @@ namespace SandPileC
     {
         public readonly int Width;
         public readonly int Height;
+        public InSetStatus InSet = InSetStatus.Unknown;
         public readonly SandPile MyZero;
+        public enum InSetStatus
+        {
+            Unknown,
+            InSet,
+            NotInSet,
+            NoZero
+        }
         private int[,] prvSandBoxArray;
         public int[,] SandBoxArray
         {
@@ -100,14 +106,15 @@ namespace SandPileC
         }
         public SandPile MeFull()
         {
-            return new SandPile(EquivArrayAllSame(SandBoxArray, 3), Width, Height);
+            return new SandPile(EquivArrayAllSame(SandBoxArray, 3), Width, Height, false, InSet);
         }
-        public bool? InSet()
+        public InSetStatus CheckInSet()
         {
-            if (MyZero == null) return null;
+            if (MyZero == null) return InSetStatus.NoZero;
             SandPile meCopy = (SandPile)this.Clone();
             meCopy.Add(MyZero);
-            return this.CompareFullyToppled(meCopy) == 0;
+            if (this.CompareFullyToppled(meCopy) == 0) return InSetStatus.InSet;
+            else return InSetStatus.NotInSet;
         }
         public int TotGrains()
         {
@@ -142,7 +149,7 @@ namespace SandPileC
                         ArrayOut[thisColNum, thisRowNum] += thisVal;
                 }
             }
-            var retSP = new SandPile(ArrayOut, _SandBox.Width, _SandBox.Height);
+            var retSP = new SandPile(ArrayOut, _SandBox.Width, _SandBox.Height, false, _SandBox.InSet);
             if (retSP.TotGrains() > startGrains) throw new Exception($"This topple gained grains! Orig: {_SandBox.ToString()} Toppled: {retSP.ToString()}");
             return retSP;
         }
@@ -158,11 +165,13 @@ namespace SandPileC
             }
             return twoDim;
         }
-        public SandPile(int[][] Elements, int _Width = 3, int _Height = 3, bool isZero = false) :
-            this(ArrayOfArrays2TwoDim(Elements, _Width, _Height), _Width, _Height, isZero)
+        public SandPile(int[][] Elements, int _Width = 3, int _Height = 3, bool isZero = false, InSetStatus _inSet = InSetStatus.Unknown) :
+            this(ArrayOfArrays2TwoDim(Elements, _Width, _Height), _Width, _Height, isZero, _inSet)
         { }
-        public SandPile(int[,] Elements, int _Width = 3, int _Height = 3, bool isZero = false)
+        public SandPile(int[,] Elements, int _Width = 3, int _Height = 3, bool isZero = false, InSetStatus _inSet = InSetStatus.Unknown)
         {
+            if (_inSet == InSetStatus.Unknown) InSet = CheckInSet();
+            else InSet = _inSet;
             Width = _Width;
             Height = _Height;
             if (Elements.GetLowerBound(0) != 0)
@@ -178,12 +187,7 @@ namespace SandPileC
         }
         public SandPile GetZero()
         {
-            var zerosOfDim = SandPileInit.KnownZeros.
-                Where(s => s.CompareDimensions(this) == 0).
-                ToList();
-            if (zerosOfDim.Count() > 1) throw new Exception($"More than 1 zero of width {Width} and height {Height} exist");
-            if (zerosOfDim.Count() == 0) return null;
-            return zerosOfDim[0];
+            return KnownZeros.OfDimension(this.Width, this.Height);
         }
         public string RawDump()
         {
@@ -217,7 +221,7 @@ namespace SandPileC
         }
         public object Clone()
         {
-            return new SandPile((int[,])this.SandBoxArray.Clone(), this.Width, this.Height);
+            return new SandPile((int[,])this.SandBoxArray.Clone(), this.Width, this.Height, false, this.InSet);
         }
         ~SandPile()
         {
