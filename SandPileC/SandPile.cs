@@ -10,27 +10,6 @@ using static SandPileC.SandPileUtils;
 
 namespace SandPileC
 {
-    public class LoadZeroes
-    {
-        public static List<SandPile> LoadKnownZeros
-        {
-            get
-            {
-                var retList = new List<SandPile>();
-                retList.Add(new SandPile(
-                    new int[,] { { 2, 1, 2 }, { 1, 0, 1 }, { 2, 1, 2 } },
-                    3, 3, true));
-                retList.Add(new SandPile(
-                    new int[,] { { 2, 3, 3, 2 }, { 3, 2, 2, 3 }, { 3, 2, 2, 3 }, { 2, 3, 3, 2 } },
-                    4, 4, true));
-                retList.Add(new SandPile(
-                    new int[,] { { 2, 3, 2, 3, 2 }, { 3, 2, 1, 2, 3 }, { 2, 1, 0, 1, 2 }, { 3, 2, 1, 2, 3 }, { 2, 3, 2, 3, 2 } },
-                    5, 5, true));
-                return retList;
-            }
-            set { }
-        }
-    }
     public class SandPile : ICloneable, IComparable<SandPile>
     {
         public readonly int Width;
@@ -39,6 +18,7 @@ namespace SandPileC
         public readonly SandPile MyZero;
         public enum InSetStatus
         {
+            NoCheck,
             Unknown,
             InSet,
             NotInSet,
@@ -64,6 +44,24 @@ namespace SandPileC
                     return true;
             }
             return false;
+        }
+        public static List<SandPile> LoadKnownZeros
+        {
+            get
+            {
+                var retList = new List<SandPile>();
+                retList.Add(new SandPile(
+                    new int[,] { { 2, 1, 2 }, { 1, 0, 1 }, { 2, 1, 2 } },
+                    3, 3, true));
+                retList.Add(new SandPile(
+                    new int[,] { { 2, 3, 3, 2 }, { 3, 2, 2, 3 }, { 3, 2, 2, 3 }, { 2, 3, 3, 2 } },
+                    4, 4, true));
+                retList.Add(new SandPile(
+                    new int[,] { { 2, 3, 2, 3, 2 }, { 3, 2, 1, 2, 3 }, { 2, 1, 0, 1, 2 }, { 3, 2, 1, 2, 3 }, { 2, 3, 2, 3, 2 } },
+                    5, 5, true));
+                return retList;
+            }
+            set { }
         }
         public void ToppleMe()
         {
@@ -96,6 +94,8 @@ namespace SandPileC
                     SandBoxArray[thisColNum, thisRowNum] += thisVal;
                 }
             }
+            // After an add, need to check inset.  Only way to ensure that inset follows is to know that what was added was inset.
+            if (InSet != InSetStatus.NoCheck) InSet = CheckInSet();
             if (FullTopple)
                 ToppleMe();
         }
@@ -111,6 +111,7 @@ namespace SandPileC
         public InSetStatus CheckInSet()
         {
             if (MyZero == null) return InSetStatus.NoZero;
+            InSet = InSetStatus.NoCheck;
             SandPile meCopy = (SandPile)this.Clone();
             meCopy.Add(MyZero);
             if (this.CompareFullyToppled(meCopy) == 0) return InSetStatus.InSet;
@@ -165,13 +166,32 @@ namespace SandPileC
             }
             return twoDim;
         }
-        public SandPile(int[][] Elements, int _Width = 3, int _Height = 3, bool isZero = false, InSetStatus _inSet = InSetStatus.Unknown) :
-            this(ArrayOfArrays2TwoDim(Elements, _Width, _Height), _Width, _Height, isZero, _inSet)
+        public SandPile(
+            int[][] Elements,
+            int _Width = 3,
+            int _Height = 3) :
+            this(ArrayOfArrays2TwoDim(Elements, _Width, _Height), _Width, _Height, false, InSetStatus.Unknown)
         { }
-        public SandPile(int[,] Elements, int _Width = 3, int _Height = 3, bool isZero = false, InSetStatus _inSet = InSetStatus.Unknown)
+        public SandPile(
+            int[,] Elements,
+            int _Width = 3,
+            int _Height = 3) :
+            this(Elements, _Width, _Height, false, InSetStatus.Unknown)
+        { }
+        private SandPile(
+            int[][] Elements,
+            int _Width,
+            int _Heigh,
+            bool isZero,
+            InSetStatus _inSet) :
+            this(ArrayOfArrays2TwoDim(Elements, _Width, 3), _Width, 3, isZero, _inSet)
+        { }
+        private SandPile(int[,] Elements,
+            int _Width = 3,
+            int _Height = 3,
+            bool isZero = false,
+            InSetStatus _inSet = InSetStatus.Unknown)
         {
-            if (_inSet == InSetStatus.Unknown) InSet = CheckInSet();
-            else InSet = _inSet;
             Width = _Width;
             Height = _Height;
             if (Elements.GetLowerBound(0) != 0)
@@ -184,6 +204,8 @@ namespace SandPileC
                 throw new Exception("Height is " + Height + ". but second dimension of array is " + Elements.GetUpperBound(1) + 1);
             SandBoxArray = Elements;
             if (!isZero) MyZero = GetZero();
+            if (_inSet == InSetStatus.Unknown) InSet = CheckInSet();
+            else InSet = _inSet;
         }
         public SandPile GetZero()
         {

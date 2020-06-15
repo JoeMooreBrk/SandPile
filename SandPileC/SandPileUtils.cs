@@ -20,7 +20,7 @@ namespace SandPileC
             // not to mark type as beforefieldinit
             static KnownZeros()
             {
-                Known = LoadZeroes.LoadKnownZeros;
+                Known = SandPile.LoadKnownZeros;
             }
 
             private KnownZeros()
