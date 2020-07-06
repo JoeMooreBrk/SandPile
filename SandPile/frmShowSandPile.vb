@@ -9,12 +9,12 @@ Public Class frmShowSandPile
         NumTopples = 0
     End Sub
     Public Sub ShowMySandPile()
-        SandPileUtils.PutSandPileInRichTextBox(rtbSandBoxArea, frmSandPile)
+        SandPileUtils.PutSandPileInRichTextBox(rtbSandPileArea, frmSandPile)
         Select Case frmSandPile.InSet
             Case SandPile.InSetStatus.InSet
-                txtSBInfo.Text = "This sandbox is in set"
+                txtSBInfo.Text = "This sandpile is in set"
             Case SandPile.InSetStatus.NotInSet
-                txtSBInfo.Text = "This sandbox is not in set"
+                txtSBInfo.Text = "This sandpile is not in set"
             Case SandPile.InSetStatus.NoZero
                 txtSBInfo.Text = "No zero definition available"
             Case Else
@@ -50,13 +50,13 @@ Public Class frmShowSandPile
         If Not frmSandPile.NeedTopple Then myTimer.Stop()
         btnOneTopple_Click(Nothing, Nothing)
         myTimer.Start()
-        If frmSandPile.SandBoxArray(0, 0) <> 0 AndAlso compareSP Is Nothing Then
+        If frmSandPile.SandPileArray(0, 0) <> 0 AndAlso compareSP Is Nothing Then
             myTimer.Stop()
             compareSP = frmSandPile.Clone
             compareTopples = NumTopples
             MsgBox($"Saved sandpile with populated corner at {NumTopples} topples.  Press button again to restart.")
         ElseIf Not compareSP Is Nothing Then
-            compareSP.AddAtSpot(frmSandPile.SandBoxArray(keepSameCol, keepSameRow) - compareSP.SandBoxArray(keepSameCol, keepSameRow), keepSameCol, keepSameRow)
+            compareSP.AddAtSpot(frmSandPile.SandPileArray(keepSameCol, keepSameRow) - compareSP.SandPileArray(keepSameCol, keepSameRow), keepSameCol, keepSameRow)
             If (compareSP.CompareTo(frmSandPile) = 0) Then
                 myTimer.Stop()
                 MsgBox($"Cycle found at {NumTopples - compareTopples.Value}")

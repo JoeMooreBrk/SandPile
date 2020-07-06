@@ -24,21 +24,21 @@ namespace SandPileC
             NotInSet,
             NoZero
         }
-        private int[,] prvSandBoxArray;
-        public int[,] SandBoxArray
+        private int[,] prvSandPileArray;
+        public int[,] SandPileArray
         {
             get
             {
-                return prvSandBoxArray;
+                return prvSandPileArray;
             }
             private set
             {
-                prvSandBoxArray = value;
+                prvSandPileArray = value;
             }
         }
         public bool NeedTopple()
         {
-            foreach (var thisVal in SandBoxArray)
+            foreach (var thisVal in SandPileArray)
             {
                 if (thisVal > 3)
                     return true;
@@ -68,7 +68,7 @@ namespace SandPileC
             SandPile meCopy = (SandPile)this.Clone();
             while (!!meCopy.NeedTopple())
                 meCopy = SandPile.OneTopple(meCopy);
-            SandBoxArray = (int[,])meCopy.SandBoxArray.Clone();
+            SandPileArray = (int[,])meCopy.SandPileArray.Clone();
         }
         public static int[,] EquivArrayAllSame(int[,] ArrayIn, int InitVal = 0)
         {
@@ -83,15 +83,15 @@ namespace SandPileC
         public void Add(SandPile SBToAdd, bool FullTopple = false)
         {
             if (SBToAdd.Width != Width)
-                throw new Exception("Cannot add a sandbox of different width: " + Width + " vs " + SBToAdd.Width);
+                throw new Exception("Cannot add a sandpile of different width: " + Width + " vs " + SBToAdd.Width);
             if (SBToAdd.Height != Height)
-                throw new Exception("Cannot add a sandbox of different height: " + Height + " vs " + SBToAdd.Height);
+                throw new Exception("Cannot add a sandpile of different height: " + Height + " vs " + SBToAdd.Height);
             for (int thisColNum = 0; thisColNum <= Width - 1; thisColNum++)
             {
                 for (int thisRowNum = 0; thisRowNum <= Height - 1; thisRowNum++)
                 {
-                    int thisVal = SBToAdd.SandBoxArray[thisColNum, thisRowNum];
-                    SandBoxArray[thisColNum, thisRowNum] += thisVal;
+                    int thisVal = SBToAdd.SandPileArray[thisColNum, thisRowNum];
+                    SandPileArray[thisColNum, thisRowNum] += thisVal;
                 }
             }
             // After an add, need to check inset.  Only way to ensure that inset follows is to know that what was added was inset.
@@ -102,11 +102,11 @@ namespace SandPileC
         public void AddAtSpot(int grainsToAdd, int colLoc, int rowLoc)
         {
             if (colLoc > Width - 1 || rowLoc > Height - 1) throw new ArgumentOutOfRangeException("Position of add is invalid for this sandpile");
-            SandBoxArray[colLoc, rowLoc] += grainsToAdd;
+            SandPileArray[colLoc, rowLoc] += grainsToAdd;
         }
         public SandPile MeFull()
         {
-            return new SandPile(EquivArrayAllSame(SandBoxArray, 3), Width, Height, false, InSet);
+            return new SandPile(EquivArrayAllSame(SandPileArray, 3), Width, Height, false, InSet);
         }
         public InSetStatus CheckInSet()
         {
@@ -120,38 +120,38 @@ namespace SandPileC
         public int TotGrains()
         {
             var totGrains = 0;
-            foreach (var thisTot in SandBoxArray) totGrains += thisTot;
+            foreach (var thisTot in SandPileArray) totGrains += thisTot;
             return totGrains;
         }
-        public static SandPile OneTopple(SandPile _SandBox)
+        public static SandPile OneTopple(SandPile _SandPile)
         {
-            if (!_SandBox.NeedTopple())
-                return _SandBox;
-            var startGrains = _SandBox.TotGrains();
-            int[,] ArrayOut = EquivArrayAllSame(_SandBox.SandBoxArray);
-            for (int thisColNum = 0; thisColNum <= _SandBox.Width - 1; thisColNum++)
+            if (!_SandPile.NeedTopple())
+                return _SandPile;
+            var startGrains = _SandPile.TotGrains();
+            int[,] ArrayOut = EquivArrayAllSame(_SandPile.SandPileArray);
+            for (int thisColNum = 0; thisColNum <= _SandPile.Width - 1; thisColNum++)
             {
-                for (int thisRowNum = 0; thisRowNum <= _SandBox.Height - 1; thisRowNum++)
+                for (int thisRowNum = 0; thisRowNum <= _SandPile.Height - 1; thisRowNum++)
                 {
-                    int thisVal = _SandBox.SandBoxArray[thisColNum, thisRowNum];
+                    int thisVal = _SandPile.SandPileArray[thisColNum, thisRowNum];
                     if (thisVal > 3)
                     {
                         ArrayOut[thisColNum, thisRowNum] += thisVal - 4;
                         if (thisRowNum > 0)
                             ArrayOut[thisColNum, thisRowNum - 1] += 1;
-                        if (thisRowNum < _SandBox.Height - 1)
+                        if (thisRowNum < _SandPile.Height - 1)
                             ArrayOut[thisColNum, thisRowNum + 1] += 1;
                         if (thisColNum > 0)
                             ArrayOut[thisColNum - 1, thisRowNum] += 1;
-                        if (thisColNum < _SandBox.Width - 1)
+                        if (thisColNum < _SandPile.Width - 1)
                             ArrayOut[thisColNum + 1, thisRowNum] += 1;
                     }
                     else
                         ArrayOut[thisColNum, thisRowNum] += thisVal;
                 }
             }
-            var retSP = new SandPile(ArrayOut, _SandBox.Width, _SandBox.Height, false, _SandBox.InSet);
-            if (retSP.TotGrains() > startGrains) throw new Exception($"This topple gained grains! Orig: {_SandBox.ToString()} Toppled: {retSP.ToString()}");
+            var retSP = new SandPile(ArrayOut, _SandPile.Width, _SandPile.Height, false, _SandPile.InSet);
+            if (retSP.TotGrains() > startGrains) throw new Exception($"This topple gained grains! Orig: {_SandPile.ToString()} Toppled: {retSP.ToString()}");
             return retSP;
         }
         private static int[,] ArrayOfArrays2TwoDim(int[][] Elements, int _Width = 3, int _Height = 3)
@@ -202,7 +202,7 @@ namespace SandPileC
                 throw new Exception("Index of 2nd dimension (Height) of array must be zero");
             if (Elements.GetUpperBound(1) + 1 != Height)
                 throw new Exception("Height is " + Height + ". but second dimension of array is " + Elements.GetUpperBound(1) + 1);
-            SandBoxArray = Elements;
+            SandPileArray = Elements;
             if (!isZero) MyZero = GetZero();
             if (_inSet == InSetStatus.Unknown) InSet = CheckInSet();
             else InSet = _inSet;
@@ -218,7 +218,7 @@ namespace SandPileC
             {
                 for (int thisColNum = 0; thisColNum <= Width - 1; thisColNum++)
                 {
-                    var useVal = SandBoxArray[thisColNum, thisRowNum];
+                    var useVal = SandPileArray[thisColNum, thisRowNum];
                     if (useVal <= 9) retStr += useVal.ToString();
                     else retStr += "*";
                 }
@@ -234,7 +234,7 @@ namespace SandPileC
             {
                 for (int thisColNum = 0; thisColNum <= Width - 1; thisColNum++)
                 {
-                    retStr += SandBoxArray[thisColNum, thisRowNum].ToString().PadRight(4);
+                    retStr += SandPileArray[thisColNum, thisRowNum].ToString().PadRight(4);
                 }
                 retStr += "\r\n";
             }
@@ -243,7 +243,7 @@ namespace SandPileC
         }
         public object Clone()
         {
-            return new SandPile((int[,])this.SandBoxArray.Clone(), this.Width, this.Height, false, this.InSet);
+            return new SandPile((int[,])this.SandPileArray.Clone(), this.Width, this.Height, false, this.InSet);
         }
         ~SandPile()
         {
@@ -254,10 +254,10 @@ namespace SandPileC
                 return Width.CompareTo(other.Width);
             if (Height != other.Height)
                 return Height.CompareTo(other.Height);
-            for (int i = 0; i < SandBoxArray.GetLength(0); i++)
-                for (int j = 0; j < SandBoxArray.GetLength(1); j++)
+            for (int i = 0; i < SandPileArray.GetLength(0); i++)
+                for (int j = 0; j < SandPileArray.GetLength(1); j++)
                 {
-                    if (SandBoxArray[i, j].CompareTo(other.SandBoxArray[i, j]) != 0) return SandBoxArray[i, j].CompareTo(other.SandBoxArray[i, j]);
+                    if (SandPileArray[i, j].CompareTo(other.SandPileArray[i, j]) != 0) return SandPileArray[i, j].CompareTo(other.SandPileArray[i, j]);
                 }
             return 0;
         }
@@ -275,8 +275,8 @@ namespace SandPileC
             {
                 for (int thisRowNum = 0; thisRowNum <= Height - 1; thisRowNum++)
                 {
-                    if (origToppled.SandBoxArray[thisRowNum, thisColNum] != otherToppled.SandBoxArray[thisRowNum, thisColNum])
-                        return origToppled.SandBoxArray[thisRowNum, thisColNum].CompareTo(otherToppled.SandBoxArray[thisRowNum, thisColNum]);
+                    if (origToppled.SandPileArray[thisRowNum, thisColNum] != otherToppled.SandPileArray[thisRowNum, thisColNum])
+                        return origToppled.SandPileArray[thisRowNum, thisColNum].CompareTo(otherToppled.SandPileArray[thisRowNum, thisColNum]);
                 }
             }
             return 0;

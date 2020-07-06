@@ -20,16 +20,16 @@ namespace SandPile.Test
 343
 131");
                 //var zeroTo3 = new Regex("^[0-3]$");
-                //for (int i = 0; i < shwPile.rtbSandBoxArea.Text.Length; i++)
+                //for (int i = 0; i < shwPile.rtbSandPileArea.Text.Length; i++)
                 //{
-                //    var thisChar = shwPile.rtbSandBoxArea.Text.Substring(i, 1);
+                //    var thisChar = shwPile.rtbSandPileArea.Text.Substring(i, 1);
                 //    if (!zeroTo3.IsMatch(thisChar))
                 //    {
-                //        shwPile.rtbSandBoxArea.Select(i, 1);
-                //        shwPile.rtbSandBoxArea.SelectionColor = Color.Red;
+                //        shwPile.rtbSandPileArea.Select(i, 1);
+                //        shwPile.rtbSandPileArea.SelectionColor = Color.Red;
                 //    }
                 //}
-                //SandPileUtils.PutSandPileInRichTextBox(shwPile.rtbSandBoxArea, newSP.SandPile);
+                //SandPileUtils.PutSandPileInRichTextBox(shwPile.rtbSandPileArea, newSP.SandPile);
                 shwPile.frmSandPile = newSP.SandPile;
                 shwPile.ShowMySandPile();
                 shwPile.ShowInTaskbar = false;

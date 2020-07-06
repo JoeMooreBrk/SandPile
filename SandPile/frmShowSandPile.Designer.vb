@@ -22,7 +22,7 @@ Partial Class frmShowSandPile
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.rtbSandBoxArea = New System.Windows.Forms.RichTextBox()
+        Me.rtbSandPileArea = New System.Windows.Forms.RichTextBox()
         Me.btnOneTopple = New System.Windows.Forms.Button()
         Me.btnAdd3s = New System.Windows.Forms.Button()
         Me.txtSBInfo = New System.Windows.Forms.TextBox()
@@ -31,14 +31,14 @@ Partial Class frmShowSandPile
         '
         'rtbSandBoxArea
         '
-        Me.rtbSandBoxArea.Font = New System.Drawing.Font("Courier New", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.rtbSandBoxArea.Location = New System.Drawing.Point(12, 12)
-        Me.rtbSandBoxArea.Name = "rtbSandBoxArea"
-        Me.rtbSandBoxArea.ReadOnly = True
-        Me.rtbSandBoxArea.Size = New System.Drawing.Size(771, 501)
-        Me.rtbSandBoxArea.TabIndex = 0
-        Me.rtbSandBoxArea.Text = ""
-        Me.rtbSandBoxArea.WordWrap = False
+        Me.rtbSandPileArea.Font = New System.Drawing.Font("Courier New", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.rtbSandPileArea.Location = New System.Drawing.Point(12, 12)
+        Me.rtbSandPileArea.Name = "rtbSandBoxArea"
+        Me.rtbSandPileArea.ReadOnly = True
+        Me.rtbSandPileArea.Size = New System.Drawing.Size(771, 501)
+        Me.rtbSandPileArea.TabIndex = 0
+        Me.rtbSandPileArea.Text = ""
+        Me.rtbSandPileArea.WordWrap = False
         '
         'btnOneTopple
         '
@@ -84,7 +84,7 @@ Partial Class frmShowSandPile
         Me.Controls.Add(Me.txtSBInfo)
         Me.Controls.Add(Me.btnAdd3s)
         Me.Controls.Add(Me.btnOneTopple)
-        Me.Controls.Add(Me.rtbSandBoxArea)
+        Me.Controls.Add(Me.rtbSandPileArea)
         Me.Name = "frmShowSandPile"
         Me.Text = "Show Pile"
         Me.ResumeLayout(False)
@@ -92,7 +92,7 @@ Partial Class frmShowSandPile
 
     End Sub
 
-    Public WithEvents rtbSandBoxArea As RichTextBox
+    Public WithEvents rtbSandPileArea As RichTextBox
     Friend WithEvents btnOneTopple As Button
     Friend WithEvents btnAdd3s As Button
     Friend WithEvents txtSBInfo As TextBox
