@@ -55,17 +55,26 @@ Public Class frmShowSandPile
             compareSP = frmSandPile.Clone
             compareTopples = NumTopples
             MsgBox($"Saved sandpile with populated corner at {NumTopples} topples.  Press button again to restart.")
+            btnContinuous.Text = "Continue"
         ElseIf Not compareSP Is Nothing Then
             compareSP.AddAtSpot(frmSandPile.SandPileArray(keepSameCol, keepSameRow) - compareSP.SandPileArray(keepSameCol, keepSameRow), keepSameCol, keepSameRow)
             If (compareSP.CompareTo(frmSandPile) = 0) Then
                 myTimer.Stop()
                 MsgBox($"Cycle found at {NumTopples - compareTopples.Value}")
+                myTimer.Stop()
+                btnContinuous.Text = "Continue"
             End If
         End If
     End Sub
 
     Private Sub btnContinuous_Click(sender As Object, e As EventArgs) Handles btnContinuous.Click
-        myTimer.Interval = 100
-        myTimer.Start()
+        If btnContinuous.Text = "Continue" Or btnContinuous.Text = "Continuous" Then
+            myTimer.Interval = 100
+            myTimer.Start()
+            btnContinuous.Text = "Stop"
+        Else
+            myTimer.Stop()
+            btnContinuous.Text = "Continue"
+        End If
     End Sub
 End Class
