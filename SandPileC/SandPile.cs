@@ -110,7 +110,7 @@ namespace SandPileC
         }
         public InSetStatus CheckInSet()
         {
-            if (MyZero == null) return InSetStatus.NoZero;
+            if (MyZero == null) return InSetStatus.NoZero; 
             InSet = InSetStatus.NoCheck;
             SandPile meCopy = (SandPile)this.Clone();
             meCopy.Add(MyZero);
